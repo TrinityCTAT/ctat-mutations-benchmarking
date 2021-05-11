@@ -1,0 +1,56 @@
+#!/usr/bin/env Rscript
+
+options(stringsAsFactors = FALSE)
+
+
+main = function () {
+    
+    suppressPackageStartupMessages(library("argparse"))
+    
+    parser = ArgumentParser()
+    parser$add_argument("--min_truth_rna_cov", type="integer", help="min rna coverage for the truth set", nargs=1, default=10)
+    parser$add_argument("--min_calling_cov", type="integer", help="min coverage depth for the variant calling", nargs=1, default=10)
+    parser$add_argument("--stats_files", help=".stats files", required=TRUE, nargs="+")
+    parser$add_argument("-v", "--verbose", action="store_true", default=TRUE,
+                        help="Print extra output [default]")
+    
+    args = parser$parse_args()
+
+    min_truth_rna_cov = args$min_truth_rna_cov
+    min_calling_cov = args$min_calling_cov
+    stats_files = args$stats_files
+
+    suppressPackageStartupMessages(library("tidyverse"))
+
+
+    pdf_filename = paste0("F1_barplot.pdf")
+    pdf(pdf_filename)
+    
+    df = read.table(stats_files[1], header=T)
+    df$statsfile = stats_files[1]
+
+    for (file in stats_files[2:length(stats_files)]) {
+        df2 = read.table(file, header=T)
+        df2$statsfile = file
+        df = rbind(df, df2)
+    }
+        
+    df = df %>% filter(rna_cov == min_truth_rna_cov & cov == min_calling_cov)
+    write.table(df, file='barplot.dat', quote=F, sep="\t", row.names=F)
+
+    df = df %>% mutate(F1 = 2/((1/sn) + (1/ppv)))
+
+    df$cats = sapply(strsplit(as.character(df$statsfile), '.', fixed=T), function(x) x[1])
+    
+    p = df %>% ggplot(aes(reorder(cats, F1), F1-0.9)) + geom_col(aes(fill=cats)) +  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    
+    plot(p)
+    
+    quit(save = "no", status = 0, runLast = FALSE)
+
+}
+
+
+if (length(sys.calls())==0) {
+    main()
+}
