@@ -24,7 +24,7 @@ import dask.dataframe as dd
 ######################
 
 UTILDIR = os.path.dirname(os.path.realpath(__file__))
-sys.path.insert(0, os.path.sep.join([UTILDIR, "../../pylib_common"]))
+sys.path.insert(0, os.path.sep.join([UTILDIR, "../pylib_common"]))
 import ctat_util
 
 logging.basicConfig(level=logging.INFO, 

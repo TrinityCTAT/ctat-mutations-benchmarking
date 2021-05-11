@@ -18,7 +18,7 @@ logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-sys.path.insert(0, os.path.sep.join([os.path.dirname(os.path.realpath(__file__)), "../pylib_common"]))
+sys.path.insert(0, os.path.sep.join([os.path.dirname(os.path.realpath(__file__)), "pylib_common"]))
 from Pipeliner import Pipeliner, Command
 
 BASEDIR = os.path.dirname(__file__)
