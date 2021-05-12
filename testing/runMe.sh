@@ -3,10 +3,8 @@
     --truth_vcf chr18.REF.vcf \
     --pred_bam chr18.bam \
     --restrict_regions_bed chr18.restrict_regions.bed \
-    --dbsnp chr18.dbsnp.vcf \
-    --rnaediting chr18.rnaediting.vcf \
+    --dbsnp chr18.dbsnp.vcf.gz \
+    --rnaediting chr18.rnaediting.vcf.gz \
     --remove_indels \
     --remove_intersect rnaediting \
     --output_dir "bmark.outdir"
-
-
