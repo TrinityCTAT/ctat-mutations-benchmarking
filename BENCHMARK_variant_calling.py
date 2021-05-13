@@ -34,16 +34,17 @@ def create_output_dir_name(args):
     if args.exome_bam:
         output_dir += ".ExomeMode"
 
-    if args.remove_indels:
-        output_dir += ".remove_indels"
+    if args.indels_only:
+        output_dir += ".indels_only"
+    elif args.snvs_only:
+        output_dir += ".snvs_only"
 
-    if args.remove_intersect:
-        for filt_type in args.remove_intersect:
-            output_dir += ".Filt_{}".format(filt_type)
+    if args.rna_editing:
+        output_dir += ".filt_RNAediting"
 
-    
+            
     return output_dir
-                                   
+
         
 def audit_command_info(output_dir, argv):
 
@@ -97,22 +98,14 @@ def main():
 
     ## var annotation options used later for filtering or analysis.
     var_annotation_opts_group = arg_parser.add_argument_group("variant annotations to include in variants table")
-    var_annotation_opts_group.add_argument('--dbsnp', dest = 'dbsnp', help="input dbsnp vcf file")
-    var_annotation_opts_group.add_argument('--rnaediting', dest = 'rnaediting', help="input rnaediting vcf file")
-    var_annotation_opts_group.add_argument('--cosmic', dest = 'cosmic', help="input cosmic file")
+    var_annotation_opts_group.add_argument('--rna_editing', dest = 'rna_editing', help="input rna-editing vcf file")
     
     ## variant filtering options:
     var_filtering_opts_group = arg_parser.add_argument_group("variant filtering parameters")
     var_filtering_opts_group.add_argument('--min_RNAseq_Depth',  type = int , help = 'Depth value for SNP analysis \n', default=1)
-    var_filtering_opts_group.add_argument("--remove_indels", action='store_true', default=False, help='remove indels')
-
+    var_filtering_opts_group.add_argument("--indels_only", action='store_true', default=False, help='indels_only')
+    var_filtering_opts_group.add_argument("--snvs_only", action='store_true', default=False, help='snvs_only')
     
-    # options to remove specific variants
-    arg_parser.add_argument('--remove_intersect',
-                            nargs='+',
-                            required = False,
-                            help= "Filter out variants that intersect with rnaediting and/or dbsnp",
-                            default = None, choices = ['rnaediting', 'dbsnp'])
     
     # Parse the arguments given 
     args = arg_parser.parse_args()
@@ -153,8 +146,8 @@ def main():
             cpu.      : CPU count for multiprocessing
             restrict_regions_bed : Restrict the VCF to regions in the given bed file 
             exome_bam : If exome data is used 
-            rnaediting: file holding RNA editing sites for removal 
-            dbsnp     : DBSNP data base  for removal of common variants 
+            rna_editing: file holding RNA editing sites for removal 
+
     '''
 
 
@@ -184,11 +177,9 @@ def main():
         if args.exome_bam:
             cmdstr += " --exome_bam {} ".format(args.exome_bam)
 
-        if args.rnaediting:
-            cmdstr += " --rnaediting {} ".format(args.rnaediting)
+        if args.rna_editing:
+            cmdstr += " --rna_editing {} ".format(args.rna_editing)
 
-        if args.dbsnp:
-            cmdstr += " --dbsnp {} ".format(args.dbsnp)
 
         pipeliner.add_commands([Command(cmdstr, "aggregated_{}.ok".format(pred_vcf_basename))])
 
@@ -197,9 +188,8 @@ def main():
         Initial filtering of variants by attributes 
             1. Filters variants by RNA-seq depth 
             2. Filters variants by Exome depth 
-            3. Remove indels (optional)
-            4. Remove variants found in rnaediting database 
-            5. Remove variants found in dbsnp database
+            3. restrict to snvs or indels (optional)
+            4. Remove variants found in rna-editing database 
 
         script used: *filterVariantTableByAttributes.py*
             input
@@ -214,11 +204,14 @@ def main():
                             "--input_table {}".format(aggregated_data_table_filename), 
                             "--output_table {}".format(filtered_data_file) ])
 
-        if args.remove_indels:
-            cmdstr += " --remove_indels "
+        if args.snvs_only:
+            cmdstr += " --snvs_only "
+        elif args.indels_only:
+            cmdstr += " --indels_only "
+        
 
-        if args.remove_intersect:
-            cmdstr += " --remove_intersect {} ".format(" ".join(args.remove_intersect))
+        if args.rna_editing:
+            cmdstr += " --remove_rna_editing " 
 
         if args.exome_bam:
             cmdstr += " --min_exome_depth {} ".format(args.min_exome_depth)
@@ -274,14 +267,14 @@ def main():
     pipeliner.add_commands([Command(cmdstr, "PR_ROC_plots.{}.ok".format(time.time()))])
 
     ## generate SNP freqs plot
-    #if args.remove_indels:
-    cmdstr = " ".join([ os.path.join(UTILDIR, "plot_SNP_freqs_barplot.py"),
-                    "--input_scored_table {}".format(" ".join(score_files)),
-                    "--output_dir {}".format(output_dir) ])
+    if not args.indels_only:
+        cmdstr = " ".join([ os.path.join(UTILDIR, "plot_SNP_freqs_barplot.py"),
+                            "--input_scored_table {}".format(" ".join(score_files)),
+                            "--output_dir {}".format(output_dir) ])
 
-    pipeliner.add_commands([Command(cmdstr, "snp_freq_barplots.{}.ok".format(time.time()))])
+        pipeliner.add_commands([Command(cmdstr, "snp_freq_barplots.{}.ok".format(time.time()))])
 
-
+    
     pipeliner.run()
 
     

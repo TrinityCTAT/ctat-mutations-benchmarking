@@ -365,9 +365,9 @@ def main():
 
     parser.add_argument("--restrict_regions_bed", help="bed file containing regions to restrict analysis to. (ie. high confidence regions)")
       
-    ## filtering options.
+    ## annotate certain sites
     parser.add_argument('--dbsnp', dest = 'dbsnp', help="input dbsnp file")
-    parser.add_argument('--rnaediting', dest = 'rnaediting', help="input rnaediting file")
+    parser.add_argument('--rna_editing', dest = 'rna_editing', help="input rna-editing file")
     parser.add_argument('--cosmic', dest = 'cosmic', help="input cosmic file")
 
     args = parser.parse_args()
@@ -456,18 +456,18 @@ def main():
         log_exec_time(tstart, "\t\t dbsnp addition", logger)
 
     #--------------------------------------
-    # Merge with the rnaediting vcf file 
+    # Merge with the rna-editing vcf file 
     #--------------------------------------
     time_start = time.time()
-    if args.rnaediting:
-        logger.info(" \t\t Adding rnaediting info")
+    if args.rna_editing:
+        logger.info(" \t\t Adding rna-editing info")
         tstart = time.time()
         df = add_variant_attribute_from_vcf(df            = df, 
-                                            vcf_filename  = args.rnaediting, 
+                                            vcf_filename  = args.rna_editing, 
                                             bed_filename  = variants_bed_filename, 
                                             column_name   = 'rnaediting_SNP',
                                             cpu = cpu)
-        log_exec_time(tstart, "\t\t rnaediting addition", logger)
+        log_exec_time(tstart, "\t\t rna-editing addition", logger)
 
     #--------------------------------------
     # Merge with the COSMIC vcf file
