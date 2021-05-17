@@ -30,18 +30,22 @@ def evaluate_accuracy_statistics(input_table_filenames, minimum_coverage, filter
         df = df.sort_values('RNAseq_Depth')
 
         # loop over each of the minimal coverages 
-        for rna_cov in minimum_coverage:
+        for ts_min_rna_cov in minimum_coverage:
 
-            ## defines the truth set.
-            tmp_df = df[df['RNAseq_Depth'] >= rna_cov].copy()
+            ## defines the truth set (ts).
+            tmp_df = df[df['RNAseq_Depth'] >= ts_min_rna_cov].copy()
             
             sn_data = []
             sp_data = []
             # total variants in reference 
             total = len(tmp_df[tmp_df['Ref_SNP'].notna()])
             # loop over each of the filter coverages 
-            for cov in filter_coverage:
-                tiny_df = tmp_df[tmp_df['RNAseq_Depth'] >= cov].copy()
+            for eval_min_rna_cov in filter_coverage:
+
+                if eval_min_rna_cov < ts_min_rna_cov:
+                    continue
+                
+                tiny_df = tmp_df[tmp_df['RNAseq_Depth'] >= eval_min_rna_cov].copy()
                 data = tiny_df.groupby('Class').Class.count().to_dict()
                 tp = data['TP'] if 'TP' in data else 0
                 fp = data['FP'] if 'FP' in data else 0
@@ -49,8 +53,8 @@ def evaluate_accuracy_statistics(input_table_filenames, minimum_coverage, filter
                 try:
                     sn = float(tp)/float(tp + fn)
                     ppv = (float(tp)/float(tp+fp))
-                    key = str(rna_cov)+'-'+str(cov)
-                    master_data[key] = [rna_cov,cov,tp,fp,fn,sn,ppv]
+                    key = str(ts_min_rna_cov) + '-' + str(eval_min_rna_cov)
+                    master_data[key] = [ts_min_rna_cov, eval_min_rna_cov, tp, fp, fn, sn, ppv]
                 except ZeroDivisionError:
                     print("-div by zero... skipping this calc.", file=sys.stderr)
                 
@@ -62,12 +66,12 @@ def evaluate_accuracy_statistics(input_table_filenames, minimum_coverage, filter
     #-----------------------
     for f_name in master_data_dict:
         f_out = open(f_name,'w')
-        f_out.write('rna_cov\tcov\ttp\tfp\tfn\tsn\tppv\n')
-        col = ['rna_cov','cov','tp','fp','fn','sn','ppv']
+        f_out.write('ts_min_rna_cov\teval_min_rna_cov\ttp\tfp\tfn\tsn\tppv\n')
+        col = ['ts_min_rna_cov','eval_min_rna_cov','tp','fp','fn','sn','ppv']
         master_data = master_data_dict[f_name]
         df = pd.DataFrame(list(master_data.values()))
         df.columns = col
-        df = df.sort_values(by=['rna_cov', 'cov'], ascending=[True, True])
+        df = df.sort_values(by=['ts_min_rna_cov', 'eval_min_rna_cov'], ascending=[True, True])
         df.to_csv(f_name,sep='\t',index=False,na_rep='NA')
 
     return

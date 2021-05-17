@@ -57,7 +57,7 @@ def plot_f1_score(input_table_filenames, output_dir):
     seen = set()
     for filename in input_table_filenames:
         df = pd.read_csv(filename, sep='\t')
-        df = df[df['rna_cov']==10]
+        df = df[df['ts_min_rna_cov']==10]
         typename = filename_to_type_string(filename)
         if typename in seen:
             raise RuntimeError("Error, converted {} to {} for unique type but not unique".format(filename, typename))
@@ -87,7 +87,7 @@ def plot_f1_score(input_table_filenames, output_dir):
     ## Rank accuracy 
     plt.figure()
     ranks = df_accuracy_stats.groupby("Type")['Accuracy'].max().sort_values()[::-1].index
-    acc = df_accuracy_stats[df_accuracy_stats['cov']==10].sort_values(by=['Accuracy'])[::-1]
+    acc = df_accuracy_stats[df_accuracy_stats['eval_min_rna_cov']==10].sort_values(by=['Accuracy'])[::-1]
     sns_plot = sns.pointplot(y="Accuracy", x="Type", data= acc, join=True, sort=False, markers=["o"], color='k')
     sns_plot = sns.pointplot(linestyles=["-"],y="Accuracy", x="Type", data= acc, join=True, sort=False, markers=["o"], palette='Set1')
     sns_plot.set_xticklabels(sns_plot.get_xticklabels(), rotation=90)

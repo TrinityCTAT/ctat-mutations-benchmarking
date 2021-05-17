@@ -20,7 +20,7 @@ def comparative_plots_per_depth(file_names, output_dir):
      
      for f_name in file_names:
          df = pd.read_csv(f_name, sep='\t')
-         df_group = df.groupby('rna_cov', as_index=False)
+         df_group = df.groupby('ts_min_rna_cov', as_index=False)
 
          for name,group in df_group:
              sub_df = group
@@ -30,7 +30,7 @@ def comparative_plots_per_depth(file_names, output_dir):
              tp = sub_df['tp']
              fp = sub_df['fp']
              fn = sub_df['fn']
-             min_cov = list(sub_df['cov'])
+             min_cov = list(sub_df['eval_min_rna_cov'])
              point_labels = min_cov
 
              ############
@@ -115,7 +115,7 @@ def comparative_plots_per_method(file_names, output_dir):
     DF.to_csv(outdata_filename, sep="\t")
     
     ## generate plots
-    df_group = DF.groupby('rna_cov', as_index=False)
+    df_group = DF.groupby('ts_min_rna_cov', as_index=False)
     for name,group in df_group:
         sub_df = group.groupby('f_name', as_index=False)
         for rna_cov, df in sub_df:
@@ -125,7 +125,7 @@ def comparative_plots_per_method(file_names, output_dir):
             tp = df['tp']
             fp = df['fp']
             fn = df['fn']
-            min_cov = list(df['cov'])
+            min_cov = list(df['eval_min_rna_cov'])
             #print(df)
 
             ###############
