@@ -321,7 +321,7 @@ def add_depth_info(df, df_depth, column_name, bam_filename):
     ## simplify to just the 2 columns we want
     df_depth = df_depth[['CHROMPOS', column_name]]
 
-    df_depth.to_csv('tmp.debug.depth_info.csv', sep = '\t', index=False, na_rep='NA') ## debugging
+    #df_depth.to_csv('tmp.debug.depth_info.csv', sep = '\t', index=False, na_rep='NA') ## debugging
     
     ## merge into the original data frame
     df = pd.merge(df, df_depth, how='left', on='CHROMPOS')
@@ -329,10 +329,10 @@ def add_depth_info(df, df_depth, column_name, bam_filename):
     return df
 
 
-def restrict_regions(input_vcf_file, restrict_regions_bed_file):
+def restrict_regions(input_vcf_file, restrict_regions_bed_file, tmpdir):
 
-    restricted_vcf_file = input_vcf_file + ".restricted.vcf"
-
+    restricted_vcf_file = os.path.join(tmpdir, os.path.basename(input_vcf_file) + ".restricted.vcf")
+    
     if os.path.exists(restricted_vcf_file):
         logger.info(" \t\t Restricted vcf file {} already exists. using it.".format(restricted_vcf_file))
     else:
@@ -387,10 +387,10 @@ def main():
     logger.info(" \tRestricting:")
     if args.restrict_regions_bed:
         logger.info(" \t \t - Restricting {} positions according to regions {}".format(pred_vcf, args.restrict_regions_bed))
-        pred_vcf = restrict_regions(pred_vcf, args.restrict_regions_bed)
+        pred_vcf = restrict_regions(pred_vcf, args.restrict_regions_bed, tmpdir)
 
         logger.info(" \t \t - Restricting {} positions according to regions {}".format(truth_vcf, args.restrict_regions_bed))
-        truth_vcf = restrict_regions(truth_vcf, args.restrict_regions_bed)
+        truth_vcf = restrict_regions(truth_vcf, args.restrict_regions_bed, tmpdir)
      
 
     #---------------------------------------------------------
@@ -427,7 +427,7 @@ def main():
     # make bed file
     #------------------
     logger.info("\t BED file:")
-    variants_bed_filename = os.path.basename(bam_filename) + ".{}_count.variants_pos.bed".format(len(df))
+    variants_bed_filename = os.path.join(tmpdir, os.path.basename(bam_filename) + ".{}_count.variants_pos.bed".format(len(df)))
     if os.path.exists(variants_bed_filename):
         logger.info("\t\t - reusing bed file: {}".format(variants_bed_filename))
     else:
@@ -436,9 +436,6 @@ def main():
         log_exec_time(tstart, "\t\t rnaseq BED added", logger)
 
 
-
-
-    variants_bed_filename = os.path.basename(bam_filename) + ".{}_count.variants_pos.bed".format(len(df))
 
 
     #--------------------------------------
