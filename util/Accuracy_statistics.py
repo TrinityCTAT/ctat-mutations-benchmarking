@@ -15,6 +15,7 @@ __status__ = "Development"
 import os, sys, csv
 import glob  # File
 import warnings
+import re
 
 warnings.filterwarnings("ignore")
 
@@ -35,10 +36,16 @@ if sys.version_info[0] != 3:
 def filename_to_type_string(longname):
     
     longname = os.path.basename(longname)
-    substr_size = 3
+    substr_size = 10
+
+    # breast.RF-regressor.vcf.gz.aggregated.dat.filtered.scored.accuracy_stats
+    longname = longname.replace(".aggregated.dat.filtered.scored.accuracy_stats", "")
+    longname = longname.replace(".vcf", "")
+    longname = re.sub(".gz$", "", longname)
 
     newname_pts = list()
     for pts in longname.split("."):
+        
         if len(pts) > substr_size:
             pts = pts[0:substr_size]
             
