@@ -12,6 +12,7 @@ import pickle
 import csv
 import time
 import logging
+import gzip
 
 import variant_bed_to_read_depth
 
@@ -36,6 +37,16 @@ logger = logging.getLogger(__name__)
 
 csv.field_size_limit(100000000)
 
+
+def open_file_for_reading(filename):
+    if re.search("\.gz$", filename):
+        return gzip.open(filename, 'rt', encoding="utf-8",
+                         errors='ignore')  # t needed for python3 to look like regular text
+    else:
+        return open(filename, 'rt', encoding="utf-8", errors='ignore')  # regular text file
+    
+
+
 def configure_vcf(vcf, column_name, chr_idx=0, coord_idx=1, refallele_idx=3, varallele_idx=4):
     '''
     Configure the vcf file to prepare for merging with other data 
@@ -45,8 +56,9 @@ def configure_vcf(vcf, column_name, chr_idx=0, coord_idx=1, refallele_idx=3, var
     '''
 
     logger.info('\t\t Loading {} VCF: {}'.format(column_name, vcf))
-    
-    df = pd.read_csv(vcf, sep='\t', header=None, comment='#',engine='python')
+
+    fh = open_file_for_reading(vcf)
+    df = pd.read_csv(fh, sep='\t', header=None, comment='#',engine='python')
     
     ## Remove "chr" if in front of chromosome number
     df.loc[:,chr_idx] = df.loc[:,chr_idx].map(str)
