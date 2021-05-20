@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib.backends.backend_pdf
 import collections
 from collections import Counter, OrderedDict
-import sys, os
+import sys, os, re
 import glob
 import ntpath
 
@@ -80,8 +80,11 @@ def comparative_plots_per_depth(file_names, output_dir):
 
 def make_legend_string(longname):
 
-    substr_size = 3
-
+    substr_size = 10
+    longname = longname.replace(".aggregated.dat.filtered.scored.accuracy_stats", "")
+    longname = longname.replace(".vcf", "")
+    longname = re.sub(".gz$", "", longname)
+    
     newname_pts = list()
     for pts in longname.split("."):
         if len(pts) > substr_size:
