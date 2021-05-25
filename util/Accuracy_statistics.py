@@ -81,27 +81,71 @@ def plot_f1_score(input_table_filenames, output_dir):
     ## Mathews correlation coefficient : (TP*TP - FP*FN)/ (TP+FP)*(TP+FN) 
     df_accuracy_stats['MCC'] = ( (df_accuracy_stats['tp'] * df_accuracy_stats['tp']) - (df_accuracy_stats['fp'] * df_accuracy_stats['fn'])) / \
                                  ( (df_accuracy_stats['tp'] + df_accuracy_stats['fp']) * (df_accuracy_stats['tp'] + df_accuracy_stats['fn'] ) )
+
+
+    ######################################
+    ################ F1 #################
+    ######################################
     
     ## Rank boxplots
     plt.figure()
+    medianprops = {'color': 'magenta', 'linewidth': 2}
+    boxprops = {'edgecolor': 'k', 'linestyle': '-', 'color':'lightskyblue'}
+    flierprops = dict(color='white',marker='o', markersize=1,markerfacecolor='auto', markeredgecolor='k')
+    whiskerprops=dict(color='k',linewidth=1,linestyle='dashed')
+    capprops=dict(color='black',linestyle= '-',linewidth=0)
+    
+    
     ranks = df_accuracy_stats.groupby("Type")['F1'].max().sort_values()[::-1].index
-    sns_plot = sns.boxplot(y="F1", x="Type", order=ranks, data=df_accuracy_stats, palette='tab10')
+    f1 = df_accuracy_stats[df_accuracy_stats['eval_min_rna_cov']==10].sort_values(by=['F1'])[::-1]
+    f1['F1'] = f1['F1']*100
+    sns_plot = sns.barplot(y="F1", x="Type", data= f1, color='hotpink',edgecolor=(0.5,0.5,0.5),linewidth=2)
+    
+    #sns_plot = sns.boxplot(y="F1", x="Type", order=ranks, data=df_accuracy_stats, palette='tab10')
+    #sns_plot.set_xticklabels(sns_plot.get_xticklabels(), rotation=90)
+
+    print(f1[['Type','F1']])
+    plt.ylim([np.min(f1['F1'])-3,np.max(f1['F1'])+2])
+
+
+    for p in sns_plot.patches:
+        sns_plot.annotate(format(p.get_height(), '.2f'),
+                          (p.get_x() + p.get_width() / 2., p.get_height()),
+                          ha = 'center', #va = 'center',
+                          xytext = (0, 23), rotation = 90, fontsize=10,
+                          textcoords = 'offset points') 
+
+    
+
     sns_plot.set_xticklabels(sns_plot.get_xticklabels(), rotation=90)
     fig = sns_plot.get_figure()
+
+    plt.xlabel('Algorithm')
     plt.title("F1 plot at Coverage 10")
     fig.savefig(os.path.join(output_dir,"F1.pdf"),bbox_inches = "tight")
+
+
+    ######################################
+    ########### Accuracy #################
+    ######################################
 
     ## Rank accuracy 
     plt.figure()
     ranks = df_accuracy_stats.groupby("Type")['Accuracy'].max().sort_values()[::-1].index
     acc = df_accuracy_stats[df_accuracy_stats['eval_min_rna_cov']==10].sort_values(by=['Accuracy'])[::-1]
-    sns_plot = sns.pointplot(y="Accuracy", x="Type", data= acc, join=True, sort=False, markers=["o"], color='k')
-    sns_plot = sns.pointplot(linestyles=["-"],y="Accuracy", x="Type", data= acc, join=True, sort=False, markers=["o"], palette='Set1')
+    acc.to_csv(os.path.join(output_dir, 'accuracy_stats.tsv'), sep='\t')
+    #sns_plot = sns.pointplot(y="Accuracy", x="Type", data= acc, join=True, sort=False, markers=["o"], color='k')
+    #sns_plot = sns.pointplot(linestyles=["-"],y="Accuracy", x="Type", data= acc, join=True, sort=False, markers=["o"], palette='Set1')
+    sns_plot = sns.barplot(y="Accuracy", x="Type", data= acc, palette='Set1')
     sns_plot.set_xticklabels(sns_plot.get_xticklabels(), rotation=90)
     fig = sns_plot.get_figure()
     plt.title("Accuracy plot at Coverage 10")
     fig.savefig(os.path.join(output_dir,"Accuracy.pdf"),bbox_inches = "tight")
 
+
+    ######################################
+    ################ MCC #################
+    ######################################
 
     ## Rank MCC
     plt.figure()
@@ -110,7 +154,7 @@ def plot_f1_score(input_table_filenames, output_dir):
     sns_plot.set_xticklabels(sns_plot.get_xticklabels(), rotation=90)
     fig = sns_plot.get_figure()
     plt.title("MCC plot at Coverage 10")
-    fig.savefig(os.path.join(output_dir,"MCC.pdf"),bbox_inches = "tight")
+    fig.savefig(os.path.join(output_dir,"MCC.pdf"), bbox_inches = "tight")
 
 
 def main():
