@@ -523,7 +523,7 @@ def main():
     # Exome 
     if args.exome_bam:
         logger.info(" \t Exome Depth")
-        exome_depth_filename = os.path.basename(args.exome_bam) + ".{}_count.variants_pos.exome.depth".format(len(df))
+        exome_depth_filename = os.path.join(tmpdir, os.path.basename(args.exome_bam) + ".{}_count.variants_pos.exome.depth".format(len(df)))
         if os.path.exists(exome_depth_filename):
             logger.info("\t\t - reusing depth file: {}".format(exome_depth_filename))
         else:
