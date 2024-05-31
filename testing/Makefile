@@ -1,4 +1,4 @@
-
+all: ref_snvs_only ref_indels_only exome_snvs_only
 
 
 ref_snvs_only:
