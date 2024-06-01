@@ -2,7 +2,7 @@ version: 1.2
 workflows:
    - name: ctat_mutations_benchmarking
      subclass: WDL
-     primaryDescriptorPath: WDL/ctat_mutation_benchmarking.wdl
+     primaryDescriptorPath: /WDL/ctat_mutation_benchmarking.wdl
      authors:
          - name: Brian Haas
            email: bhaas@broadinstitute.org
