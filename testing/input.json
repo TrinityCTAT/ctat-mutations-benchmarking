@@ -1,0 +1,11 @@
+{ "ctat_mutations_benchmarking.sample_id" : "test_sample",
+  "ctat_mutations_benchmarking.predicted_vcf" : ["chr18.PRED.raw.vcf",  "chr18.PRED.init.vcf",  "chr18.PRED.annot_n_filtered.vcf"],
+  "ctat_mutations_benchmarking.truth_vcf" : "chr18.exome.only_snps.vcf",
+  "ctat_mutations_benchmarking.bam" : "chr18.bam",
+  "ctat_mutations_benchmarking.bai" : "chr18.bam.bai",
+  "ctat_mutations_benchmarking.exome_bam" : "chr18.exome.bam",
+  "ctat_mutations_benchmarking.exome_bai" : "chr18.exome.bam.bai",
+  "ctat_mutations_benchmarking.min_exome_depth" : 10,
+  "ctat_mutations_benchmarking.rna_edit_vcf" : "chr18.rnaediting.vcf.gz",
+  "ctat_mutations_benchmarking.snvs_only" : true
+}
