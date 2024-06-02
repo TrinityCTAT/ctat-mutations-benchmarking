@@ -11,6 +11,7 @@ rm -rf ./outdir*
 rm -rf ./bmark.outd*
 rm -rf ./*_ctat_mutations_benchmarking
 rm -f ./_LAST
+rm -f ./*.bai
 
 
 
