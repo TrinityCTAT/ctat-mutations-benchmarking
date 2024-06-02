@@ -60,7 +60,7 @@ def samtools_depths(arg):
 
     bam_index_filename = f"{bam_filename}.bai"
     if not os.path.exists(bam_index_filename):
-        cmd = "samtools index {}".format(index_filename)
+        cmd = "samtools index {}".format(bam_index_filename)
         subprocess.check_call(cmd, shell=True)
         
 
@@ -98,7 +98,7 @@ def generate_depths(df_bed, bam_filename, cpu, depth_filename):
 
     bam_index_filename = f"{bam_filename}.bai"
     if not os.path.exists(bam_index_filename):
-        cmd = "samtools index {}".format(index_filename)
+        cmd = "samtools index {}".format(bam_index_filename)
         subprocess.check_call(cmd, shell=True)
 
     
