@@ -102,6 +102,6 @@ RUN apt-get -qq -y remove build-essential gcc wget && \
     apt-get -qq -y autoremove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
-ENV PATH=/software/CTAT-benchmarking/:$PATH
+
 
 

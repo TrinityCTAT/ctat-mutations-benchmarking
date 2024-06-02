@@ -7,11 +7,13 @@ workflow ctat_mutations_benchmarking {
         File truth_vcf
         Array[File] predicted_vcf
         File bam
+        File bai
 
         File? high_conf_regions_bed
         File rna_edit_vcf
 
         File? exome_bam
+        File? exome_bai
         Int? min_exome_depth
 
         Boolean snvs_only = false
@@ -21,7 +23,7 @@ workflow ctat_mutations_benchmarking {
         Int cpu = 8
         Int extra_disk_space = 20
 
-        String docker = "trinityctat/ctat_mutation_benchmarking:latest"
+        String docker = "trinityctat/ctat_mutations_benchmarking:latest"
     }
 
     call benchmark_variants {
@@ -30,7 +32,9 @@ workflow ctat_mutations_benchmarking {
             truth_vcf=truth_vcf,
             predicted_vcf=predicted_vcf,
             bam=bam,
+            bai=bai,
             exome_bam=exome_bam,
+            exome_bai=exome_bai,
             min_exome_depth=min_exome_depth,
             snvs_only=snvs_only,
             indels_only=indels_only,
@@ -61,9 +65,11 @@ task benchmark_variants {
         Array[File] predicted_vcf
         File truth_vcf
         File bam
+        File bai
 
 
         File? exome_bam
+        File? exome_bai
         Int? min_exome_depth
 
         Boolean snvs_only = false
@@ -82,7 +88,7 @@ task benchmark_variants {
     String bmark_output_dir = sample_id + "-benchmarking"
     
     command <<<
-        set -e
+        set -ex
 
         mkdir benchmarking
 
@@ -117,11 +123,11 @@ task benchmark_variants {
           --pred_bam ~{bam} \
           ~{"--exome_bam " + exome_bam} \
           ~{"--min_exome_depth " + min_exome_depth } \
-          ~{"--restrict_regions " + high_conf_regions_bed} \
-          --rnaediting ~{rna_edit_vcf} \
-          --remove_intersect rnaediting \
+          ~{"--restrict_regions_bed " + high_conf_regions_bed} \
+          --rna_editing ~{rna_edit_vcf} \
           --output_dir ~{bmark_output_dir} \
-          --remove_indels \
+          ~{true='--snvs_only' false='' snvs_only} \
+          ~{true='--indels_only' false='' indels_only} \
           --cpu ~{cpu}
 
          tar -zcf  ~{bmark_output_dir}.tar.gz  ~{bmark_output_dir}

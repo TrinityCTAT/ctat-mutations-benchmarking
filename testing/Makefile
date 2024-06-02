@@ -49,7 +49,8 @@ test_docker:
             --snvs_only \
             --output_dir "/data/bmark.outdir.ref_snvs_only.docker"
 
-
+test_wdl:
+	miniwdl run ../WDL/ctat_mutation_benchmarking.wdl -i input.json --verbose
 
 
 clean:
