@@ -57,7 +57,13 @@ def samtools_depths(arg):
     '''
     # unpack the inputted arguments 
     subset_df_bed, bam_filename = arg
-    
+
+    bam_index_filename = f"{bam_filename}.bai"
+    if not os.path.exists(bam_index_filename):
+        cmd = "samtools index {}".format(index_filename)
+        subprocess.check_call(cmd, shell=True)
+        
+
     # gather the current Chromosome along with the regions start and end point that the bed file spans 
     chrom = subset_df_bed['Chr'].iloc[0]
     start = subset_df_bed['Pos-1'].iloc[0]
