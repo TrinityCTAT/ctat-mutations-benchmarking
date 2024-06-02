@@ -26,7 +26,7 @@ RUN wget https://github.com/arq5x/bedtools2/releases/download/v2.28.0/bedtools-2
    tar -zxvf bedtools-2.28.0.tar.gz && \
    cd bedtools2 && \
    make && \
-   mv bin /usr/local/bin/ && \
+   mv bin/* /usr/local/bin/ && \
    rm ../bedtools-2.28.0.tar.gz && rm -r ../bedtools2
 
 WORKDIR /software

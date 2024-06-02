@@ -148,8 +148,12 @@ def add_variant_attribute_from_vcf(df, vcf_filename, bed_filename, column_name, 
         output1 = header + output1
         # command for bedtools intersect 
         cmd = "bedtools intersect -a stdin -b {}".format(bed_filename)
-        output = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, encoding='utf8', shell=True).communicate(input = output1)[0]
-
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, encoding='utf8', shell=True)
+        output, errors = proc.communicate(input=output1)
+        
+        #output = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, encoding='utf8', shell=True).communicate(input = output1)[0]
+        assert proc.returncode == 0, "CMD: {} failed with ret: {}, errors: {}".format(cmd, proc.returncode, errors)
+                
         return output
 
     # get the list of chromosomes in the vcf 
