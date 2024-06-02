@@ -92,7 +92,7 @@ RUN wget https://github.com/arq5x/bedtools2/releases/download/v2.28.0/bedtools-2
 
 WORKDIR /software
 
-ENV git_co=a72002c7c697c19874bffc91d2dfe4584213ad9f
+ENV git_co=1c9b989f5d5c69eed1d06d5482cf550571c0dc21
 RUN git clone https://github.com/TrinityCTAT/ctat-mutations-benchmarking.git && \
      cd ctat-mutations-benchmarking && \
      git checkout ${git_co}
