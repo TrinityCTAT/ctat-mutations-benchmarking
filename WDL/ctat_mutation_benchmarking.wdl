@@ -111,7 +111,7 @@ task benchmark_variants {
           bmarking_output_dir="${bmarking_output_dir}.indels_only"
         fi
         
-        python /software/CTAT-benchmarking/CTAT-mutation-benchmarking/BENCHMARK_variant_calling.py \
+        python /software/ctat-mutations-benchmarking/BENCHMARK_variant_calling.py \
           --pred_vcf ~{sep=' ' predicted_vcf} \
           --truth_vcf ~{truth_vcf} \
           --pred_bam ~{bam} \

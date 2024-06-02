@@ -38,6 +38,20 @@ exome_snvs_only:
 
 
 
+test_docker:
+	docker run --rm -it -v `pwd`:/data trinityctat/ctat_mutations_benchmark:latest \
+         python /software/ctat-mutations-benchmarking/BENCHMARK_variant_calling.py \
+            --pred_vcf /data/chr18.PRED.raw.vcf /data/chr18.PRED.init.vcf /data/chr18.PRED.annot_n_filtered.vcf \
+            --truth_vcf /data/chr18.REF.vcf \
+            --pred_bam /data/chr18.bam \
+            --restrict_regions_bed /data/chr18.restrict_regions.bed \
+            --rna_editing /data/chr18.rnaediting.vcf.gz \
+            --snvs_only \
+            --output_dir "/data/bmark.outdir.ref_snvs_only.docker"
+
+
+
+
 clean:
 	./cleanMe.sh
 
