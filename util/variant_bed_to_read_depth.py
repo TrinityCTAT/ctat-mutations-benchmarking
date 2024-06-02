@@ -95,6 +95,13 @@ def generate_depths(df_bed, bam_filename, cpu, depth_filename):
             depths for each of the locations in the bed file 
     '''
     logger.info("\t\t Creating Depth file: {}".format(depth_filename))
+
+    bam_index_filename = f"{bam_filename}.bai"
+    if not os.path.exists(bam_index_filename):
+        cmd = "samtools index {}".format(index_filename)
+        subprocess.check_call(cmd, shell=True)
+
+    
     # List of all the chromosomes in the BEDfile
     chrs = list(df_bed['Chr'].unique())
     # count for the number of lines in bed file 

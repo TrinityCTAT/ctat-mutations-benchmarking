@@ -7,7 +7,7 @@ workflow ctat_mutations_benchmarking {
         File truth_vcf
         Array[File] predicted_vcf
         File bam
-        File bai
+        File? bai
 
         File? high_conf_regions_bed
         File rna_edit_vcf
@@ -65,7 +65,7 @@ task benchmark_variants {
         Array[File] predicted_vcf
         File truth_vcf
         File bam
-        File bai
+        File? bai
 
 
         File? exome_bam
