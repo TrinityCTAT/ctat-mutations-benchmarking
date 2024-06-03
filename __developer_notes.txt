@@ -1,0 +1,60 @@
+Steps in process:
+
+For each prediction vcf:
+
+   # aggregating variants and metadata
+   
+   util/aggregate_variants_n_depth_to_table.py
+        - if a restrcted regions bed file exists, first extracts variants that overlap those regions, creates separate .restricted.vcf files for each.
+        - creates dataframe with predicted and reference variant locations, incorporates RNA-editing site info
+        - generates a .bed file containing each variant position and uses that with samtools to get rna-seq coverage depth at each site.
+        - if an exome bam is provided, gets depth info for the exome too.
+        - generates vcf.aggregated.dat file containing tab-delimited info from above:
+
+        data formatted as:
+
+        CHROMPOS    CHROM  POS      RNA_SNP  Ref_SNP  rnaediting_SNP  RNAseq_Depth
+        18:691266   18     691266   A:G      A:G      NA              17.0
+        18:2547500  18     2547500  G:T      G:T      NA              12.0  
+        18:2616457  18     2616457  G:C      G:C      NA              11.0
+        18:2700877  18     2700877  A:G      A:G      NA              26.0
+        18:2707619  18     2707619  G:A      G:A      NA              36.0
+        18:2740714  18     2740714  A:G      A:G      NA              55.0
+        18:2750477  18     2750477  A:G      A:G      NA              30.0
+        18:2909700  18     2909700  C:T      C:T      NA              11.0
+        18:5244173  18     5244173  C:T      C:T      NA              25.0
+        ...
+
+
+
+    # filtering variants
+
+    util/filterVariantTableByAttributes.py
+        - requires rna-seq covarage (expressed variant)
+        - removes known rna-editing sites
+        - if exome bam provided, restricts to min exome coverage depth.
+        - generates vcf.aggregated.dat.filtered
+
+
+    # scoring TP, FP, and FN
+
+    util/classify_TP_FP_FN.py"
+        - scores each variant in the filtered file as true positive, false poisitive, or false negative.
+        - adds 'Class' columin with {TP,FP,FN} assignment.
+
+
+
+# Accuracy evaluation
+
+util/EvaluateAccuracy.py
+
+    - The above-generated scored files are analyzed for accuracy.
+    - Accuracy is evaluated by:
+      - first defining a truth set based on a minimum RNA-seq coverage
+      - scoring accuracy using that truth set separately for sets of variants defined at different minimum rna-seq coverage depths.
+      - vcf.aggregated.dat.filtered.scored.accuracy_stats files are generated for each analysis and then plotted (see *.pdf files)
+
+
+
+    
+
