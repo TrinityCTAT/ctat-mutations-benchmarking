@@ -22,6 +22,7 @@ workflow ctat_mutations_benchmarking {
         String memory = "18G"
         Int cpu = 8
         Int extra_disk_space = 20
+        Int preemptible = 0
 
         String docker = "trinityctat/ctat_mutations_benchmarking:latest"
     }
@@ -43,6 +44,7 @@ workflow ctat_mutations_benchmarking {
             cpu=cpu,
             high_conf_regions_bed=high_conf_regions_bed,
             rna_edit_vcf=rna_edit_vcf,
+            preemptible=preemptible,
             docker = docker
     }
 
@@ -83,6 +85,7 @@ task benchmark_variants {
         Int extra_disk_space
         String memory
         String docker
+        Int preemptible
     }
 
     String bmark_output_dir = sample_id + "-benchmarking"
@@ -143,7 +146,7 @@ task benchmark_variants {
         disks: "local-disk " + ceil(size(bam, "GB")  + extra_disk_space + size(truth_vcf, "GB")) + " HDD"
         docker: docker
         memory: memory
-        preemptible: 2
+        preemptible: preemptible
         cpu : cpu
     }
 
