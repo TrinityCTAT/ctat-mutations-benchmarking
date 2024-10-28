@@ -116,6 +116,8 @@ task benchmark_variants {
         if [[ "~{indels_only}" == "true" ]]; then
           bmarking_output_dir="${bmarking_output_dir}.indels_only"
         fi
+
+        set +e
         
         python /software/ctat-mutations-benchmarking/BENCHMARK_variant_calling.py \
           --pred_vcf ~{sep=' ' predicted_vcf} \
@@ -130,8 +132,11 @@ task benchmark_variants {
           ~{true='--indels_only' false='' indels_only} \
           --cpu ~{cpu}
 
-         tar -zcf  ~{bmark_output_dir}.tar.gz  ~{bmark_output_dir}
+         ret=$?
         
+         tar -zcf  ~{bmark_output_dir}.tar.gz  ~{bmark_output_dir}
+
+         exit $ret
     >>>
 
     runtime {
